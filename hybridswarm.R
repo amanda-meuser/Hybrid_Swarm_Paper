@@ -33,14 +33,14 @@ df_hybridswarm <- df_relevant %>% filter(ActiveHybSwarm != "N")
   #theme_pubclean() +
   #geom_text(aes(label=..count..), stat = "count", position=position_dodge(width=0.9), vjust=-0.25) +
   xlab("Year") + ylab("Number of Publications")+ 
-   ylim(0,8))
+   scale_y_continuous(breaks = seq(0, 9, 2), limits = c(0, 9)) )
 
 (freq <- ggplot(df_hybridswarm, aes(Year)) +
     geom_bar(fill = "#0073C2FF") +
     #theme_pubclean() +
     #geom_text(aes(label=..count..), stat = "count", position=position_dodge(width=0.9), vjust=-0.25) +
     xlab("Year") + ylab("Number of Publications")+ 
-    ylim(0,8))
+    scale_y_continuous(breaks = seq(0, 9, 2), limits = c(0, 9)) )
 
 
 pdf("freq_of_term_usage.pdf", height = 5, width = 10)
@@ -48,6 +48,19 @@ pdf("freq_of_term_usage.pdf", height = 5, width = 10)
   plot_annotation(tag_levels = 'A') 
 dev.off()
 
+# COMBINED VERSION
+
+cols <- brewer.pal(8, "Set2")
+
+(freq_combined <- ggplot(df_relevant, aes(x = Year, fill = ActiveHybSwarm)) +
+    geom_bar(position="stack", stat="count")+
+    xlab("Year") + ylab("Number of Publications")+ 
+    scale_fill_manual(values = c("#FC8D62", "#E5C494"), labels = c("No", "Yes"), name = "Active Hybrid\nSwarm?")+
+    scale_y_continuous(breaks = seq(0, 9, 2), limits = c(0, 9)) )
+
+pdf("freq_of_term_usage_combined.pdf", height = 7, width = 6)
+freq_combined 
+dev.off()
 
 ## ----- Summary Stats Plots -----
 
@@ -223,7 +236,7 @@ subset_hybridswarm2 <- subset(df_hybridswarm, df_hybridswarm$Nloci < 500) # 28 o
 # Disturbance per taxa
 df_disturbance <- df_hybridswarm[!is.na(df_hybridswarm$Disturbance),]
 (disturbance_taxa <- ggplot(data=subset(df_disturbance, !is.na(OrganismType)), aes(x=OrganismType, fill=Disturbance)) + 
-  geom_bar(position="dodge") +
+  geom_bar(stat="count", position=position_dodge(preserve = "single")) +
   labs(y = "Number of Publications", x = "Organism Type")+
   scale_fill_discrete(name = "Disturbance \nPresent?", labels = c("No", "Yes")))
   #geom_text(aes(label=..count..), stat = "count", position=position_dodge(width=0.9), vjust=-0.25))
@@ -271,7 +284,10 @@ pdf("summary_plots_numeric.pdf", height = 26, width = 14)
   sites + sites2 +
   loci + loci3 + 
   plot_layout(ncol = 2)+ 
-  plot_annotation(tag_levels = 'A')
+  plot_annotation(tag_levels = 'A') &   
+  theme(axis.title = element_text(size = 18), 
+        axis.text.x = element_text(size = 14), 
+        axis.text.y = element_text(size = 14))
 dev.off()
   
 pdf("summary_plots_YorN.pdf", height = 22, width = 14)  
@@ -279,7 +295,10 @@ pdf("summary_plots_YorN.pdf", height = 22, width = 14)
   geno_count + pheno_count +
   data_count + disturbance_taxa + 
   plot_layout(ncol = 2)+ 
-  plot_annotation(tag_levels = 'A')
+  plot_annotation(tag_levels = 'A') &   
+    theme(axis.title = element_text(size = 18), 
+          axis.text.x = element_text(size = 14), 
+          axis.text.y = element_text(size = 14))
 dev.off()
 
 

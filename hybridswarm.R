@@ -25,18 +25,21 @@ df_hybridswarm <- df_relevant %>% filter(ActiveHybSwarm != "N")
 # Author Wordcloud Datasheet
 #df_authors <- read_csv("hybridswarm - AuthorFrequency.csv")
 
+cols <- palette.colors(palette = "Okabe-Ito")
+#"#000000" "#E69F00" "#56B4E9" "#009E73" "#F0E442" "#0072B2" "#D55E00" "#CC79A7" "#999999"
+
 ## ----- Frequency of Usage Plots -----
 
 #Shows how many papers used the term 'hybrid swarm' each year
 (freq_raw <- ggplot(df_relevant, aes(Year)) +
-  geom_bar(fill = "#0073C2FF") +
+  geom_bar(fill = cols[3]) +
   #theme_pubclean() +
   #geom_text(aes(label=..count..), stat = "count", position=position_dodge(width=0.9), vjust=-0.25) +
   xlab("Year") + ylab("Number of Publications")+ 
    scale_y_continuous(breaks = seq(0, 9, 2), limits = c(0, 9)) )
 
 (freq <- ggplot(df_hybridswarm, aes(Year)) +
-    geom_bar(fill = "#0073C2FF") +
+    geom_bar(fill = cols[3]) +
     #theme_pubclean() +
     #geom_text(aes(label=..count..), stat = "count", position=position_dodge(width=0.9), vjust=-0.25) +
     xlab("Year") + ylab("Number of Publications")+ 
@@ -50,31 +53,31 @@ dev.off()
 
 # COMBINED VERSION
 
-cols <- brewer.pal(8, "Set2")
-
 (freq_combined <- ggplot(df_relevant, aes(x = Year, fill = ActiveHybSwarm)) +
     geom_bar(position="stack", stat="count")+
     xlab("Year") + ylab("Number of Publications")+ 
-    scale_fill_manual(values = c("#FC8D62", "#E5C494"), labels = c("No", "Yes"), name = "Active Hybrid\nSwarm?")+
+    scale_fill_manual(values = c(cols[7], cols[3]), labels = c("No", "Yes"), name = "Active Hybrid\nSwarm?")+
     scale_y_continuous(breaks = seq(0, 9, 2), limits = c(0, 9)) )
 
-pdf("freq_of_term_usage_combined.pdf", height = 7, width = 6)
-freq_combined 
-dev.off()
+# pdf("freq_of_term_usage_combined.pdf", height = 7, width = 6)
+# freq_combined 
+# dev.off()
 
 ## ----- Summary Stats Plots -----
 
 #Shows how many papers used the term 'hybrid swarm' to describe each type of organism
 (organism <- ggplot(data = subset(df_hybridswarm, !is.na(OrganismType)), aes(fct_infreq(OrganismType))) +
-  geom_bar(fill = "#0073C2FF") +
+  geom_bar(fill = cols[3]) +
   #theme_pubclean() +
   geom_text(aes(label=..count..), stat = "count", position=position_dodge(width=0.9), vjust=-0.25) +
   xlab("Organism Type") + ylab("Number of Publications")+ 
-    scale_y_continuous(breaks = breaks_pretty()))
+    scale_y_continuous(breaks = breaks_pretty())+ 
+   theme(axis.text.x = element_text(angle = 25)))
+
 
 #Shows how many papers used the term 'hybrid swarm' to describe each genus
 (genus <- ggplot(data = subset(df_hybridswarm, !is.na(Genus)), aes(fct_infreq(Genus))) +
-    geom_bar(fill = "#0073C2FF") +
+    geom_bar(fill = cols[3]) +
     #theme_pubclean() +
     theme(axis.text.x = element_text(angle = 90)) +
     #geom_text(aes(label=..count..), stat = "count", position=position_dodge(width=0.9), vjust=-0.25)+
@@ -85,35 +88,35 @@ dev.off()
 
 # number of species used
 (species <- ggplot(data = df_hybridswarm, aes(x=Nspecies)) + 
-    geom_bar(fill = "#0073C2FF") +
+    geom_bar(fill = cols[3]) +
     scale_x_continuous(breaks = round(seq(min(df_hybridswarm$Nspecies), max(df_hybridswarm$Nspecies), by = 2),1)) +
     xlab("Number of Species") + ylab("Number of Publications"))
 
 
 # Number of inds used, one is NA
-(inds <- ggplot(data = df_hybridswarm, aes(x=Nind)) + 
-    geom_histogram(fill = "#0073C2FF") +
+(inds <- ggplot(subset(df_hybridswarm, !is.na(Nind)), aes(Nind)) + 
+    geom_histogram(fill = cols[3], bins = 40) +
     ylim(0,15) +
     xlab("Number of Individuals") + ylab("Number of Publications"))
 
 # look only at entries w fewer than 2000 inds
 subset_hybridswarm2 <- subset(df_hybridswarm, df_hybridswarm$Nind < 2000) # 45 of the original 48 inds
 (inds2 <- ggplot(data = subset_hybridswarm2, aes(x=Nind)) + 
-    geom_histogram(fill = "#0073C2FF") +
+    geom_histogram(fill = cols[3]) +
     ylim(0,15) +
     xlab("Number of Individuals (only fewer than 2000)") + ylab("Number of Publications"))
 
 
 # Number of sampling sites used, 4 are NA
-(sites <- ggplot(data = df_hybridswarm, aes(x=Locations)) + 
-    geom_histogram(fill = "#0073C2FF") +
+(sites <- ggplot(subset(df_hybridswarm, !is.na(Locations)), aes(Locations)) + 
+    geom_histogram(fill = cols[3], bins = 40) +
     ylim(0,15) +
     xlab("Number of Sampling Sites") + ylab("Number of Publications"))
 
 # look only at entries w fewer than sites
 subset_hybridswarm2 <- subset(df_hybridswarm, df_hybridswarm$Locations < 100) # 42 of the original 48 inds
 (sites2 <- ggplot(data = subset_hybridswarm2, aes(x=Locations)) + 
-    geom_histogram(fill = "#0073C2FF") +
+    geom_histogram(fill = cols[3]) +
     ylim(0,15) +
     xlab("Number of Sampling Sites (only fewer than 100)") + ylab("Number of Publications"))
 
@@ -122,7 +125,7 @@ subset_hybridswarm2 <- subset(df_hybridswarm, df_hybridswarm$Locations < 100) # 
 # distribution of loci, only 40 used loci
 df_hybridswarm$Nloci <- as.numeric(df_hybridswarm$Nloci)
 (loci <- ggplot(data = df_hybridswarm, aes(x=Nloci)) + 
-    geom_histogram(fill = "#0073C2FF") +
+    geom_histogram(fill = cols[3]) +
     xlab("Number of loci") + ylab("Number of Publications"))
 
 #get position of the outlier and remove it
@@ -130,14 +133,14 @@ a <- max(which(df_hybridswarm$Nloci > 100000))
 subset_hybridswarm <- df_hybridswarm[-a,]
 
 # distrib of loci w outlier removed
-(loci2 <- ggplot(data = subset_hybridswarm, aes(x=Nloci)) + 
-    geom_histogram(fill = "#0073C2FF") +
-    xlab("Number of loci w outlier removed") + ylab("Number of Publications"))
+(loci2 <- ggplot(subset(subset_hybridswarm, !is.na(Nloci)), aes(Nloci)) + 
+    geom_histogram(fill = cols[3], bins = 40) +
+    xlab("Number of loci") + ylab("Number of Publications"))
 
 # look only at entries w fewer than 500 loci
 subset_hybridswarm2 <- subset(df_hybridswarm, df_hybridswarm$Nloci < 500) # 28 of the original 40 inds, so only 12 have more than 5000
 (loci3 <- ggplot(data = subset_hybridswarm2, aes(x=Nloci)) + 
-    geom_histogram(fill = "#0073C2FF") +
+    geom_histogram(fill = cols[3]) +
     ylim(0,30) +
     xlab("Number of loci (only fewer than 500)") + ylab("Number of Publications"))
 
@@ -204,6 +207,7 @@ subset_hybridswarm2 <- subset(df_hybridswarm, df_hybridswarm$Nloci < 500) # 28 o
   scale_fill_discrete(name = "Used \nGenetic \nEvidence?", labels = c("No", "Yes")))
 
 
+
 # Plots of both phenotypic and genetic data usage over time
 # proportion of studies
 (both_prop <- ggplot(data = subset(df_hybridswarm, !is.na(GenoAndPhenoEvidence)), aes(fill=GenoAndPhenoEvidence, x=Year)) + 
@@ -214,9 +218,17 @@ subset_hybridswarm2 <- subset(df_hybridswarm, df_hybridswarm$Nloci < 500) # 28 o
 # number of studies
 (both_count <- ggplot(data = subset(df_hybridswarm, !is.na(GenoAndPhenoEvidence)), aes(fill=GenoAndPhenoEvidence, x=Year)) + 
   geom_bar(position="stack", stat="count")+
-  scale_fill_manual(values = c("mediumpurple1", "brown2", "grey", "steelblue1"))+
+  scale_fill_manual(values = c(cols[3], cols[3], cols[7]), name = "Evidence Type", labels = c("Micro Sats", "Only Phenotypic", "Other Genetic", "Simulations", "SNPs"))+
     xlab("Year") + ylab("Number of Publications"))
 
+# Version w snps, microsats, only pheno, and other geno, to match sankey plot
+# USES FOR LOOP IN SANKEY PLOTTING, RUN LINES 349-371 FIRST
+#"#000000" "#E69F00" "#56B4E9" "#009E73" "#F0E442" "#0072B2" "#D55E00" "#CC79A7" "#999999"
+(both_count2 <- ggplot(data = df_relevant_filled, aes(fill=GeneticEvType, x=Year)) + 
+    geom_bar(position="stack", stat="count")+
+    scale_fill_manual(values = c(cols[3],cols[8],cols[4],cols[9],cols[2]), name = "Evidence Type", labels = c("Micro Sats", "Only Phenotypic", "Other Genetic", "Simulations", "SNPs"))+
+    scale_y_continuous(breaks = breaks_pretty())+
+    xlab("Year") + ylab("Number of Publications"))
 
 # Data availability
 # proportion of studies
@@ -229,8 +241,7 @@ subset_hybridswarm2 <- subset(df_hybridswarm, df_hybridswarm$Nloci < 500) # 28 o
 (data_count <- ggplot(data = subset(df_hybridswarm, !is.na(DataAvailable)), aes(fill=DataAvailable, x=Year)) + 
   geom_bar(position="stack") +
   xlab("Year") + ylab("Number of Publications")+
-  scale_fill_discrete(name = "Data \nAvailable?", labels = c("No", "Yes")))
-  # geom_text(aes(label=..count..), stat = "count", position=position_dodge(width=0.9), vjust=-0.25)
+    scale_fill_manual(values = c(cols[7], cols[3]), labels = c("No", "Yes"), name = "Data\nAvailable?"))
 
 
 # Disturbance per taxa
@@ -238,8 +249,19 @@ df_disturbance <- df_hybridswarm[!is.na(df_hybridswarm$Disturbance),]
 (disturbance_taxa <- ggplot(data=subset(df_disturbance, !is.na(OrganismType)), aes(x=OrganismType, fill=Disturbance)) + 
   geom_bar(stat="count", position=position_dodge(preserve = "single")) +
   labs(y = "Number of Publications", x = "Organism Type")+
-  scale_fill_discrete(name = "Disturbance \nPresent?", labels = c("No", "Yes")))
-  #geom_text(aes(label=..count..), stat = "count", position=position_dodge(width=0.9), vjust=-0.25))
+  scale_fill_manual(values = c(cols[7], cols[3]), labels = c("No", "Yes"), name = "Disturbance\nPresent?")+ 
+    theme(axis.text.x = element_text(angle = 25)))
+
+#New version with disturbance and total count per organism combined 
+df_disturbance <- df_hybridswarm[!is.na(df_hybridswarm$Disturbance),]
+df_disturbance2 <- df_disturbance %>% group_by(OrganismType) %>% mutate(count_taxa_occurr = n())
+(organism_disturbance <- ggplot(data=df_disturbance2, aes(reorder(x=OrganismType, -count_taxa_occurr), fill=Disturbance)) +
+    geom_bar(stat = "count") +
+    labs(y = "Number of Publications", x = "Organism Type")+
+    scale_fill_manual(values = c(cols[7], cols[3]), labels = c("No", "Yes"), name = "Disturbance\nPresent?")+ 
+    scale_y_continuous(breaks = breaks_pretty())+ 
+    theme(axis.text.x = element_text(angle = 25)))
+    
 
 # disturbance over years
 (disturbance_years <- ggplot(data=subset(df_disturbance, !is.na(OrganismType)), aes(x=Year, fill=Disturbance)) + 
@@ -261,44 +283,57 @@ df_disturbance <- df_hybridswarm[!is.na(df_hybridswarm$Disturbance),]
 
 ## ----- Output as a pdf -----
 
-pdf("summary_plots_all.pdf", height = 48, width = 14)
-  freq + organism + 
-  genus + species +
-  inds + inds2 + 
-  sites + sites2 +
-  loci + loci2 + loci3 +
-  SNP_prop + SNP_count + 
-  micro_prop + micro_count +
-  geno_prop + geno_count +
-  pheno_prop + pheno_count +
-  both_prop + both_count +
-  data_prop + data_count +
-  disturbance_taxa + disturbance_years + 
-  plot_layout(ncol = 2)+ 
-  plot_annotation(tag_levels = 'A')
-dev.off()
+# pdf("summary_plots_all.pdf", height = 48, width = 14)
+#   freq + organism + 
+#   genus + species +
+#   inds + inds2 + 
+#   sites + sites2 +
+#   loci + loci2 + loci3 +
+#   SNP_prop + SNP_count + 
+#   micro_prop + micro_count +
+#   geno_prop + geno_count +
+#   pheno_prop + pheno_count +
+#   both_prop + both_count +
+#   data_prop + data_count +
+#   disturbance_taxa + disturbance_years + 
+#   plot_layout(ncol = 2)+ 
+#   plot_annotation(tag_levels = 'A')
+# dev.off()
+# 
+# pdf("summary_plots_numeric.pdf", height = 26, width = 14)
+#   organism + species +
+#   inds + inds2 + 
+#   sites + sites2 +
+#   loci + loci3 + 
+#   plot_layout(ncol = 2)+ 
+#   plot_annotation(tag_levels = 'A') &   
+#   theme(axis.title = element_text(size = 18), 
+#         axis.text.x = element_text(size = 14), 
+#         axis.text.y = element_text(size = 14))
+# dev.off()
+#   
+# pdf("summary_plots_YorN.pdf", height = 22, width = 14)  
+#   SNP_count + micro_count +
+#   geno_count + pheno_count +
+#   data_count + disturbance_taxa + 
+#   plot_layout(ncol = 2)+ 
+#   plot_annotation(tag_levels = 'A') &   
+#     theme(axis.title = element_text(size = 18), 
+#           axis.text.x = element_text(size = 14), 
+#           axis.text.y = element_text(size = 14))
+# dev.off()
 
-pdf("summary_plots_numeric.pdf", height = 26, width = 14)
-  organism + species +
-  inds + inds2 + 
-  sites + sites2 +
-  loci + loci3 + 
+# figure 2 used in manuscript
+pdf("summary_combined.pdf", height = 16, width = 15)  
+  data_count + freq_combined + 
+  organism_disturbance + both_count2 + 
+  species + inds + 
+  sites + loci2 + 
   plot_layout(ncol = 2)+ 
   plot_annotation(tag_levels = 'A') &   
   theme(axis.title = element_text(size = 18), 
         axis.text.x = element_text(size = 14), 
         axis.text.y = element_text(size = 14))
-dev.off()
-  
-pdf("summary_plots_YorN.pdf", height = 22, width = 14)  
-  SNP_count + micro_count +
-  geno_count + pheno_count +
-  data_count + disturbance_taxa + 
-  plot_layout(ncol = 2)+ 
-  plot_annotation(tag_levels = 'A') &   
-    theme(axis.title = element_text(size = 18), 
-          axis.text.x = element_text(size = 14), 
-          axis.text.y = element_text(size = 14))
 dev.off()
 
 
@@ -319,6 +354,10 @@ dev.off()
 
 # all 67 relevant papers
 
+#reorder cols
+#              MS        N       OP      OG    S       SNP      Y
+cols2 <- c(cols[5], cols[7],cols[8],cols[4],cols[9],cols[2],cols[3])
+#"#000000" "#E69F00" "#56B4E9" "#009E73" "#F0E442" "#0072B2" "#D55E00" "#CC79A7" "#999999"
 
 # # changing genetic and phenotypic to only genetic and only phenotypic to make it explicit
 # df_relevant_filled$GenoAndPhenoEvidence <- replace(df_relevant_filled$GenoAndPhenoEvidence,df_relevant_filled$GenoAndPhenoEvidence=="Genetic","Only Genetic")
@@ -359,7 +398,7 @@ p <- ggplot(df_long, aes(x = x, next_x = next_x, node = node, next_node = next_n
   geom_alluvial(flow.alpha = .6) +
   #geom_alluvial_label(aes( x = as.numeric(x) + .05, label = after_stat(paste0(node, "\nn = ", freq))), size = 3, color = "black") +
     geom_alluvial_label(size = 3, color = "black") +
-  scale_fill_brewer(palette = "Set2") +
+  scale_fill_manual(values = cols2) +
   labs(x = NULL, y = "Number of Publications") +
   theme(legend.position = "none", axis.text.y= element_text(size = 10), axis.text.x= element_text(size = 9, color = "black"), axis.title.y =  element_text(size = 10))+
     scale_x_discrete(labels = c("Evidence \nType", "Active Hybrid \nSwarm?", "F1s \nPresent?", "F2 or Later \nGenerations Present?", "Backcrosses \nPresent?"))
@@ -424,15 +463,17 @@ df_hybridswarm_filled <- df_relevant_filled %>% filter(ActiveHybSwarm != "N")
 
 df_long <- df_hybridswarm_filled %>% make_long(GeneticEvType, F1Present, F2orLaterPresent, BackcrossPresent)
 
-cols <- brewer.pal(8, "Set2")
-cols <- cols[-5]
+# rearrange cols again
+#              MS        N       OP      OG    SNP      Y
+cols3 <- c(cols[5], cols[7],cols[8],cols[4],cols[2],cols[3])
+#"#000000" "#E69F00" "#56B4E9" "#009E73" "#F0E442" "#0072B2" "#D55E00" "#CC79A7" "#999999"
 
 ## actual plot
 p2 <- ggplot(df_long, aes(x = x, next_x = next_x, node = node, next_node = next_node, fill = factor(node), label = node)) +
   geom_alluvial(flow.alpha = .6) +
   #geom_alluvial_label(aes( x = as.numeric(x) + .05, label = after_stat(paste0(node, "\nn = ", freq))), size = 3, color = "black") +
   geom_alluvial_label(size = 3, color = "black") +
-  scale_fill_manual(values = cols) +
+  scale_fill_manual(values = cols3) +
   labs(x = NULL, y = "Number of Publications") +
   theme(legend.position = "none", axis.text.y= element_text(size = 10), axis.text.x= element_text(size = 9, color = "black"), axis.title.y =  element_text(size = 10))+
   scale_x_discrete(labels = c("Evidence \nType", "F1s \nPresent?", "F2 or Later \nGenerations Present?", "Backcrosses \nPresent?"))

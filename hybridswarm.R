@@ -1,9 +1,6 @@
 ## Setup -----
 
-setwd("~/documents/Mandeville_Lab/Hybrid_Swarm/R/Data/")
-
 library(tidyverse)
-#library(wordcloud2)
 library(RColorBrewer)
 library(scales)
 library(patchwork)
@@ -21,9 +18,6 @@ df_raw <- read_csv("hybridswarm - Cleaned.csv")
 # remove papers that aren't relevant
 df_relevant <- df_raw %>% filter(Relevant != "N")
 df_hybridswarm <- df_relevant %>% filter(ActiveHybSwarm != "N")
-
-# Author Wordcloud Datasheet
-#df_authors <- read_csv("hybridswarm - AuthorFrequency.csv")
 
 cols <- palette.colors(palette = "Okabe-Ito")
 #"#000000" "#E69F00" "#56B4E9" "#009E73" "#F0E442" "#0072B2" "#D55E00" "#CC79A7" "#999999"
@@ -270,63 +264,11 @@ df_disturbance2 <- df_disturbance %>% group_by(OrganismType) %>% mutate(count_ta
   scale_fill_discrete(name = "Disturbance \nPresent?", labels = c("No", "Yes")))
 
 
-## Author frequency -----
-
-# #More simplistic model
-# wordcloud(words = df_authors$Author, freq = df_authors$Frequency, min.freq = 1,
-#           max.words=500, random.order=FALSE, rot.per=0.35,
-#           colors=brewer.pal(8, "Dark2"))
-# 
-# #Newer package with more options
-# wordcloud2(data = df_authors, size=0.5, color='random-dark')
-
-
-## ----- Output as a pdf -----
-
-# pdf("summary_plots_all.pdf", height = 48, width = 14)
-#   freq + organism + 
-#   genus + species +
-#   inds + inds2 + 
-#   sites + sites2 +
-#   loci + loci2 + loci3 +
-#   SNP_prop + SNP_count + 
-#   micro_prop + micro_count +
-#   geno_prop + geno_count +
-#   pheno_prop + pheno_count +
-#   both_prop + both_count +
-#   data_prop + data_count +
-#   disturbance_taxa + disturbance_years + 
-#   plot_layout(ncol = 2)+ 
-#   plot_annotation(tag_levels = 'A')
-# dev.off()
-# 
-# pdf("summary_plots_numeric.pdf", height = 26, width = 14)
-#   organism + species +
-#   inds + inds2 + 
-#   sites + sites2 +
-#   loci + loci3 + 
-#   plot_layout(ncol = 2)+ 
-#   plot_annotation(tag_levels = 'A') &   
-#   theme(axis.title = element_text(size = 18), 
-#         axis.text.x = element_text(size = 14), 
-#         axis.text.y = element_text(size = 14))
-# dev.off()
-#   
-# pdf("summary_plots_YorN.pdf", height = 22, width = 14)  
-#   SNP_count + micro_count +
-#   geno_count + pheno_count +
-#   data_count + disturbance_taxa + 
-#   plot_layout(ncol = 2)+ 
-#   plot_annotation(tag_levels = 'A') &   
-#     theme(axis.title = element_text(size = 18), 
-#           axis.text.x = element_text(size = 14), 
-#           axis.text.y = element_text(size = 14))
-# dev.off()
 
 # figure 2 used in manuscript
 pdf("summary_combined.pdf", height = 16, width = 15)  
   data_count + freq_combined + 
-  organism_disturbance + both_count2 + 
+  both_count2 + organism_disturbance +
   species + inds + 
   sites + loci2 + 
   plot_layout(ncol = 2)+ 
@@ -526,26 +468,5 @@ pdf("sankey_plot_both_new.pdf", height = 10)
   plot_layout(ncol = 1)+ 
   plot_annotation(tag_levels = 'A')
 dev.off()
-
-
-## Testing out example plots
-# ggplot(df_long, aes(x = x, 
-#                next_x = next_x, 
-#                node = node, 
-#                next_node = next_node,
-#                fill = factor(node))) +
-#   geom_sankey() +
-#   scale_fill_discrete(drop=FALSE)
-# 
-# ggplot(df_long, aes(x = x, next_x = next_x, node = node, next_node = next_node, fill = factor(node), label = node)) +
-#   geom_sankey(flow.alpha = .6,
-#               node.color = "gray30") +
-#   geom_sankey_label(size = 3, color = "white", fill = "gray40") +
-#   scale_fill_viridis_d(drop = FALSE) +
-#   theme_sankey(base_size = 18) +
-#   labs(x = NULL) +
-#   theme(legend.position = "none",
-#         plot.title = element_text(hjust = .5)) +
-#   ggtitle("Hybrid swarm outcomes")
 
 

@@ -1,4 +1,4 @@
-# The ambiguity of "hybrid swarm": A review of inconsistent definitions and applications in existing research
+# Is it a ‘hybrid swarm’ ? A call for precise definitions in conservation genetics
 R scripts posted here were used for the PubMed journal search and in creating plots. The paper will soon be available on bioRxiv and the raw data files from this paper will be made available on DataDryad. 
 
 ## Description of scripts
